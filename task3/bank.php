@@ -50,7 +50,7 @@ if($_SERVER["REQUEST_METHOD"] == 'POST'){
 <body style="background-image: url('background.jpg'); background-size:100%;">
 
     <div class="container w-50 mt-5">
-        <form method="POST" action="test.php">
+        <form method="POST" action="bank.php">
 
             <div class="form-group text-light">
                 <h1>Bank Application</h1>
