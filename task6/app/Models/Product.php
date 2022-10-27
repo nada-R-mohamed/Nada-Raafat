@@ -15,4 +15,9 @@ class Product extends Model
         'brand_id','subcategory_id','image',
         'details_ar','details_en'
     ];
+
+    public function getImageAttribute($image)
+    {
+        return asset("images/products/" . $image);
+    }
 }

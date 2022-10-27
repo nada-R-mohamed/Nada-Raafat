@@ -20,9 +20,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard',[DashboardController::class , 'index']);
-Route::get('/dashboard/products',[ProductsController::class,'index']);
-Route::get('/dashboard/products/create',[ProductsController::class,'create']);
-Route::post('/dashboard/products/create/store',[ProductsController::class,'store']);
-Route::get('/dashboard/products/edit/{id}',[ProductsController::class ,'edit']);
+Route::prefix('dashboard')->name('dashboard')->group(function(){
+
+Route::get('/',[DashboardController::class , 'index']);
+Route::get('/products',[ProductsController::class,'index']);
+Route::get('/products/create',[ProductsController::class,'create']);
+Route::post('/products/create/store',[ProductsController::class,'store']);
+Route::get('/products/edit/{id}',[ProductsController::class ,'edit']);
+
+});
 
