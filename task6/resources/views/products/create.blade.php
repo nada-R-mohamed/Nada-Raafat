@@ -8,7 +8,7 @@
 
 
     <div class="container">
-        <form action="{{ asset('/dashboard/products/create/store') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('dashboard.products.store') }}" method="post" enctype="multipart/form-data">
 
             @csrf
 

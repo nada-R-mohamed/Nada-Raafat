@@ -43,15 +43,35 @@
                             <td> {{ $product->name_en }} </td>
                             <td> {{ $product->name_ar }} </td>
                             <td> {{ $product->price }} </td>
-                            <td> {{ $product->quantity }} </td>
-                            <td> {{ $product->status }} </td>
+                            <td @class([
+
+                                    'text-center',
+                                    'text-danger'=> $product->quantity == 0,
+                                    'text-warning'=>$product->quantity > 0 && $product->quantity < 5,
+                                    'text-success'=> $product->quantity >= 5
+                                    ])>{{ $product->quantity }}
+
+                            </td>
+                            <td @class([
+
+                                'text-danger'=> $product->status == 0,
+                                'text-success'=> $product->status == 1
+                                ])>{{ $product->status == 1 ? 'Active' : 'Not Active' }}
+
+                            </td>
                             <td> {{ $product->created_at }} </td>
                             <td> {{ $product->updated_at }} </td>
                             <td>
 
-                                <a href="{{asset('dashboard/products/edit/'. $product->id) }}"class="btn btn-outline-success">Edit</a>
+                                <a href="{{ route('dashboard.products.edit', $product->id) }}"class="btn btn-outline-success">Edit</a>
 
-                                <a href="{{asset('dashboard/products/delete/' . $product->id) }}" class="btn btn-outline-danger">Delete</a>
+                                <form action="{{route('dashboard.products.delete', $product->id)}}" method="post" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-outline-danger" > Delete </button>
+                                </form>
+
+
 
                             </td>
                         </tr>

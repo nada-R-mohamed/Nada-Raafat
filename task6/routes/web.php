@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProductsController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\DashboardController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 /*
@@ -20,13 +21,27 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::prefix('dashboard')->name('dashboard')->group(function(){
 
-Route::get('/',[DashboardController::class , 'index']);
-Route::get('/products',[ProductsController::class,'index']);
-Route::get('/products/create',[ProductsController::class,'create']);
-Route::post('/products/create/store',[ProductsController::class,'store']);
-Route::get('/products/edit/{id}',[ProductsController::class ,'edit']);
+Route::prefix('dashboard')->name('dashboard')->middleware(['auth','verified'])->group(function () {
 
+    Route::get('/', [DashboardController::class, 'index']);
+
+    Route::prefix('products')->name('.products.')->controller(ProductsController::class)->group(function () {
+
+        Route::get('/','index')->name('index');
+        Route::get('/create','create')->name('create');
+        Route::post('/store','store')->name('store');
+        Route::get('/edit/{id}','edit')->name('edit');
+        Route::put('/update/{id}','update')->name('update');
+        Route::delete('/delete/{id}','delete')->name('delete');
+
+
+    });
 });
+
+
+Auth::routes(['verify' => true]);
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')
+->middleware(['auth','verified']);
 

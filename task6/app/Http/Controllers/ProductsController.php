@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Products\StoreProductRequest;
+use App\Http\Requests\Products\UpdateProductRequest;
 use App\Models\Brand;
 use App\Models\Product;
+use App\Services\Media;
 use App\Models\Subcategory;
 use Illuminate\Http\Request;
 
@@ -13,43 +16,32 @@ class ProductsController extends Controller
     {
         $products = Product::all();
 
-        return view('products.index',compact('products'));
-
+        return view('products.index', compact('products'));
     }
 
     public function create()
     {
-        $brands = Brand::select('id','name_en')->orderBy('name_en','ASC')->get();
-        $subcategories = Subcategory::select('id','name_en')->orderBy('name_en','ASC')->get();
-        return view('products.create' , compact('subcategories','brands'));
+        $brands = Brand::select('id', 'name_en')->orderBy('name_en', 'ASC')->get();
+        $subcategories = Subcategory::select('id', 'name_en')->orderBy('name_en', 'ASC')->get();
+        return view('products.create', compact('subcategories', 'brands'));
 
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-
-        $request->validate([
-            'name_en'=>['required','string','between:3,512'],
-            'name_ar'=>['required','string','between:3,512'],
-            'price'  =>['required','numeric','between:1,999999,99'],
-            'details_en'=>['required','string'],
-            'details_ar'=>['nullable','string'],
-            'quantity'=> ['nullable','numeric','between:1,9999'],
-            'status'=>['nullable','in:1,0'],
-            'subcategory_id'=>['required','integer','exists:subcategories,id'],
-            'brand_id'=>['required','integer','exists:brands,id'],
-            'image'=>['required','mimes:jpeg,jpg,png','max:2048']
-        ]);
 
 
         $newImgName = $request->file('image')->hashName();
-        $request->file('image')->move(public_path('images\products',$newImgName));
-        $valueOfInputes = $request->except('image','_token');
-        $valueOfInputes['image'] = $newImgName;
-        Product::create($valueOfInputes);
-        return redirect('dashboard/products')
-        ->with('success','product created successfully');
 
+        $request->file('image')->move(public_path('images\products', $newImgName));
+
+        $valueOfInputes = $request->except('image', '_token');
+
+        $valueOfInputes['image'] = $newImgName;
+
+        Product::create($valueOfInputes);
+
+        return redirect()->route('dashboard.products.index')->with('success', 'Product Created Successfully');
     }
 
     public function edit($id)
@@ -57,12 +49,43 @@ class ProductsController extends Controller
 
         $product = Product::findOrFail($id);
 
-        $brands  = Brand::select('id','name_en')->orderBy('name_en','ASC')->get();
+        $brands  = Brand::select('id', 'name_en')->orderBy('name_en', 'ASC')->get();
 
-        $subcategories = Subcategory::select('id','name_en')->orderBy('name_en','ASC')->get();
+        $subcategories = Subcategory::select('id', 'name_en')->orderBy('name_en', 'ASC')->get();
 
 
-        return view('products.edit',compact('product','subcategories','brands'));
+        return view('products.edit', compact('product', 'subcategories', 'brands'));
+    }
 
+    public function update(UpdateProductRequest $request, $id)
+    {
+
+        $data = $request->except('_token', '_method', 'image');
+
+        $product = Product::findOrFail($id);
+
+        if ($request->hasFile('image')) {
+
+            $newImageName = Media::upload($request->file('image'), 'product');
+
+            $data['image'] = $newImageName;
+
+            Media::delete(public_path('images\products\\' . $product->image));
+        }
+
+
+        $product->update($data);
+        return redirect()->route('dashboard.products.index')->with(' success ', ' Product Updated Successfully');
+    }
+
+    public function delete($id)
+    {
+        $product = Product::findOrFail($id);
+
+        Media::delete(public_path('images\products\\' . $product->image));
+
+        $product->delete();
+
+        return redirect()->route('dashboard.products.index')->with('success', 'Product Deleted Successfully ');
     }
 }

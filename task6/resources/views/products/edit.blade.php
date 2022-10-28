@@ -8,9 +8,11 @@
 
 
     <div class="container">
-        <form action="{{ asset("/dashboard/products/edit/" . $product->id ) }}" method="POST" enctype="multipart/form-data">
-
+        <form action="{{route('dashboard.products.update', $product->id)}}" method="POST" enctype="multipart/form-data">
+            @method('PUT')
             @csrf
+
+
 
             <div class="form-row">
                 <div class="col-md-6 mb-3">
@@ -96,8 +98,8 @@
 
                 <div class="form-row">
                     <label for="validationTooltip05">Image</label>
-                    <img src="{{asset('images/product/'.$product->image)}}" class="w-50">
-                    <input type="file" class="form-control"  name="image" id="file-ip-1" onchange="showPreview(event)">
+                    <img src="{{asset('images/products/'. $product->image)}}" class="w-50">
+                    <input type="file" class="form-control"  name="image" id="file-ip-1">
                     @error('image')
                         <div class="text-danger font-weight-bold my-2">{{ $message }}</div>
                     @enderror
@@ -115,14 +117,3 @@
     </div>
 
 @endsection
-<script>
-    function showPreview(event)
-    {
-        if (event.target.files.length > 0) {
-            var src = URL.createObjectURL(event.target.files[0]);
-            var preview = document.getElementById("file-ip-1-preview");
-            preview.src = src;
-            preview.style.display = "block";
-        }
-    }
-</script>
